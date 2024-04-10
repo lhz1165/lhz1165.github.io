@@ -40,7 +40,7 @@
     <link rel="alternate" type="application/rss+xml" title="{{ site.title | escape }}" href="{{ "/feed.xml" | absolute_url }}">
     {% endif %}
     
-    <link rel="shortcut icon" href="{{ "/favicon.ico" | absolute_url }}">
+    <link rel="shortcut icon" href="{{ "/favicon.ico"}}">
     
     <meta name="robots" content="noarchive">
     
@@ -83,7 +83,7 @@
                 </time>
                 {% assign page_author = page.author | default: site.author | default: nil | escape %}
                 {% if page_author %}
-                â€¢ <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page_author }}</span></span>
+                â€<span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page_author }}</span></span>
                 {% endif %}
             </h2>
             {% endif %}
