@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "机器指令"
+category: Csapp (cmu 15-213)
 ---
 CSAPP第二部分
 
