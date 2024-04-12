@@ -2,7 +2,7 @@
 layout: default
 ---
 <article itemscope itemtype="http://schema.org/BlogPosting">
-
+  {% include sidebar.html %}
   <!-- <header class="post-header">
     <h1 class="post-title" itemprop="name headline">{{ page.title | escape }}</h1>
     <p class="post-meta">
@@ -22,6 +22,4 @@ layout: default
   {% if site.disqus.shortname %}
     {% include disqus_comments.html %}
   {% endif %}
-
-  {% include sidebar.html %}
 </article>

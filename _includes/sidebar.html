@@ -1,12 +1,39 @@
 <!-- sidebar.html -->
+<!-- _includes/sidebar.html -->
+
 
 <aside class="sidebar">
-    <h2>Categories</h2>
-    <ul>
-        {% for category in site.categories %}
-            <li>
-                <a href="{{ site.baseurl }}/categories/{{ category | first | slugify }}">{{ category | first }}</a>
-            </li>
-        {% endfor %}
+    <h2>目录</h2>
+    <ul id="directory">
+<!--        {% for category in site.categories %}-->
+<!--            <li>-->
+<!--                <a href="{{ site.baseurl }}/categories/{{ category | first | slugify }}">{{ category | first }}</a>-->
+<!--            </li>-->
+<!--        {% endfor %}-->
     </ul>
 </aside>
+
+<script>
+    window.onload = function() {
+    var directory = document.getElementById('directory');
+    var headings = document.querySelectorAll('h2');
+    var directoryContent = '';
+
+    var count = 0;
+
+    headings.forEach(function(heading) {
+        if (count >= 3) {
+            var title = heading.innerText;
+            var anchor = heading.id;
+            directoryContent += '<li>';
+            directoryContent += '<a href="#' + anchor + '">' + title + '</a>';
+            directoryContent += '</li>';
+            console.log(count +": "+title);
+        }
+        count++;
+    });
+
+    directory.innerHTML = directoryContent;
+};
+
+</script>
