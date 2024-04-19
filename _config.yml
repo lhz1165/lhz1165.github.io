@@ -24,9 +24,11 @@ twitter:
 
 plugins:
   - jekyll-target-blank
-
+  - jekyll-paginate
 target-blank:
     rel: nofollow
 
 header_page_refs: ['now','contact', 'class']
+paginate: 5
+paginate_path: "/page:num/"
 

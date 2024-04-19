@@ -9,5 +9,5 @@ gemspec
 
 gem 'kramdown-parser-gfm'
 gem 'wdm', '>= 0.1.0'
-
+gem  'jekyll-paginate'
 gem "webrick", "~> 1.8"

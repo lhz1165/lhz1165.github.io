@@ -1,0 +1,12 @@
+.pagination {
+	display: flex;
+}
+.previous, a.previous {
+	flex: 1;
+}
+.page_number {
+	flex: 1;
+}
+next, a.next {
+	flex: 1;
+}
