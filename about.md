@@ -25,10 +25,10 @@ order: 0
 
 # 技能
 
-- Java核心基础，java并发
-- 熟悉 Spring, Springboot, Spring cloud 框架
+- Java核心基础，Java并发
+- 熟悉 Spring, Springboot, Spring Cloud 框架
 - Mybatis
-- CSAPP
+- Csapp
 - Mysql, Oracle
 
 
