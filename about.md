@@ -12,7 +12,7 @@ order: 0
 # 基本信息
 
 - **赖泓志** - **JAVA后端工程师**
-- **年龄**: 26
+- **年龄**: 27
 - **学校**:  杭州电子科技大学(2015 - 2019)  **专业**: 网络工程 (本科)
 - **联系方式**：18100176437 \| laihongzzz@gmail.com
 
@@ -22,7 +22,7 @@ order: 0
 
 - 熟悉 Java核心基础，Java并发；了解 C，Golang
 - 熟悉JVM，了解垃圾收集器以及GC算法
-- 开发框架:  熟悉 Spring, Springboot, Spring Cloud ,Mybatis, Jpa
+- 开发框架:  熟悉 Spring, Springboot, Spring Cloud ,Mybatis
 - 版本控制: Git, Svn
 - 数据库：Oracle, MySQL, PostgreSQL
 - 计算机基础: 熟悉计算机底层， 操作系统，数据结构，计算机网络等
@@ -54,11 +54,25 @@ order: 0
 
 **浙江立元科技有限有限公司** \| 2023 - 今
 
-- **DQS(视频质量检测系统)**
-  - 
+- **设备视频质量监测系统**
+  - 设备点位在线率每日计算，定时生成设备在线率统计图报表
+  - 设备点位完好率每日实时抽帧，定时生成视频完好率统计图报表
+  - 设备点位录像回放抽帧，定时生成录像完好率统计图报表
 
-- **VRA(大数据实时预警)**
-  - 
+
+- **设备数据质量监测系统**
+  - 人卡，设备活跃率，时钟准确性，大图唯一，上传及时性.....统计
+  - 车卡
+  - 非机动车
+  - 人体
+
+- **实时大数据实时预警**
+  - 对接第三方，公司平台预警，推送到预警平台
+  - 预警平台生成处置单下发给单位
+
+- **设备运维管理系统**
+  - 设备维护保修
+  - 设备每月计费
 
 
 # 个人项目
@@ -67,8 +81,9 @@ order: 0
   - ([cache](https://github.com/lhz1165/cache_lab)) 
   -  ([malloc](https://github.com/lhz1165/malloc_lab)) 
   - 等等...
-- Mit 6.824 课程lab 
+- MIT 6.824 课程lab 
   - ([https://github.com/lhz1165/6.824](https://github.com/lhz1165/6.824))
+- MIT 6.S081
 - 基于Vue Spring的户籍管理系统 
   - （[https://github.com/lhz1165/houseHolderFront](https://github.com/lhz1165/houseHolderFront)）
 - springboot, layui，html,css,js 个人课程表
