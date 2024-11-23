@@ -1,13 +1,21 @@
 ---
 layout: post
-title: "xv6-lab3"
-category: os-6s081-lab
+title: "xv6-PageTable虚拟内存"
+category: os-6s081-source
 ---
 
-6.s081 lab3 page
+6.s081 pageTable
 
-# lab3
-## 背景
+# 虚拟内存-页表机制
+虚拟地址：分为两部分，前一个部分用来作为页表的索引(数组下标)；后面部分作为页内偏移量(OFFSET)
+
+操作系统把物理内存分成一个一个的页，一个页大小由人工设定，这影响到虚拟内存的OFFSET长度
+
+
+
+
+
+
 
 ### 物理内存管理
 
@@ -73,19 +81,5 @@ proc_freepagetable包含以下两个
 
 2. **uvmfree**：回收进程所有的虚拟页（pte=0）和物理页（kfree），回收进程的页表的虚拟页和物理页（uvmunmap和freewalk）
 
-选择分支
 
-```shell
-git checkout pgtbl
-```
-
-## 1  Print a page table
-
-## 2 A kernel page table per process
-
-## 3 Simplify `copyin/copyinstr`
-
-
-
-## 实验结果
 
