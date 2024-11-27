@@ -29,6 +29,6 @@ target-blank:
     rel: nofollow
 
 header_page_refs: ['now','contact', 'class']
-paginate: 5
+paginate: 10
 paginate_path: "/page:num/"
 
