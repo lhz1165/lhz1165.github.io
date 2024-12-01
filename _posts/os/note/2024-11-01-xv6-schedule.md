@@ -12,7 +12,7 @@ category: os-6s081-source
 
 ## 调度原理
 
-用户进程执行一段时间后，操作系统产生时钟中断，中断会从用户态切换到内核态，然后执行trap过程，调用usertrap 函数执行对应的中断处理程序，处理时钟中断会调用yield函数，让出CPU，实现进程切换。
+用户进程执行一段时间后，操作系统产生时钟中断，中断会从用户态切换到内核态，然后执行trap过程，调用usertrap 函数执行对应的中断处理程序，处理时钟中断会调用yield函数，让出CPU，进入调度(scheduler)线程，调度线程选择一个进程恢复到用户态运行。
 
 ```c
 void
@@ -157,3 +157,82 @@ swtch:
         ret
 ```
 
+
+
+## scheduler
+
+```c
+void
+scheduler(void)
+{
+  struct proc *p;
+  struct cpu *c = mycpu();
+  
+  c->proc = 0;
+  for(;;){
+    // Avoid deadlock by ensuring that devices can interrupt.
+    intr_on();
+
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if(p->state == RUNNABLE) {
+		
+          //选择一个RUNNABLE的进程，分配CPU，开始运行
+        p->state = RUNNING;
+        c->proc = p;
+        swtch(&c->context, &p->context);
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+      release(&p->lock);
+    }
+  }
+}
+```
+
+
+
+## 调度流程图
+
+![image-shced1](/assets/os/note-schedule/sched1.png)
+
+图1 P1切换到P2的流程
+
+### 用户进程1
+
+P1用户态执行的时候，T1时刻发生始终中断，通过trap过程进入P1的内核态，使用内核栈调用usertrap()函数。
+
+再 usertrap 中调用 yield()->sched()-> swtch()函数,把当前进程的context保存在cpu的context中，恢复调度线程的contxt。（**此时P1是停在了sched()的swtch（）函数的下一行，也就是mycpu()->intena = intena**）
+
+### 调度线程
+
+此时ra发生改变（之前cpu的contxt所保存的指令地址），会跳转到scheduler()函数里面，也就是c->proc = 0;这一行。
+
+调度线程再循环中找到一个RUNABLE，就绪态的进程，调用swtch(),恢复P2的contxt，再ret到P2上次处理时钟中断的位置
+
+### 用户进程2
+
+也就是**用户进程1 **进入调度线程的入口下面 **mycpu()->intena = intena **这一行，然后再从yield()返回，回到用户态
+
+```
+void
+sched(void)
+{
+  int intena;
+  struct proc *p = myproc();
+
+  intena = mycpu()->intena;
+  swtch(&p->context, &mycpu()->context);
+  mycpu()->intena = intena;
+}
+```
+
+
+
+如果此时用户进程2执行一段时间发生时钟中断切换到P1 如下图红色线的流程，与上面一模一样
+
+![image-shced1](/assets/os/note-schedule/sched2.png)
+
+图2 P2切换到P1的流程
