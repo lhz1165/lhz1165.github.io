@@ -4,7 +4,7 @@ title: "mysql主从同步"
 category: CI/DI
 ---
 
-# mysql主从同步
+mysql主从同步
 
 ## 需求
 
@@ -90,8 +90,13 @@ docker run -d \
 ```
 
 ### 主库配置
+导出数据,binlog是增量同步的 因此需要先在服务器中使用mysqldump命令来导出初始表和数据
 
-配置主库 my.cnf  开启gtid同步，然后重启 mysql 服务
+```
+mysqldump -uroot -p --set-gtid-purged=OFF test1 t1 > /home/master-t1-table.sql
+```
+
+配置主库 my.cnf  开启gtid同步，一般在/etc/mysql/my.cnf然后重启 mysql 服务
 
 ```
 server-id=1
@@ -102,7 +107,7 @@ enforce_gtid_consistency=ON
 skip-slave-start=ON
 ```
 
-1. 给已有的用户授权
+1. 给已有的用户授权,必须修改密码插件，从库才可以使用密码连接（**MySQL 8.0 默认用户认证插件** 是 `caching_sha2_password`，相比旧的 `mysql_native_password`）
 
 ```mysql
 mysql -u root -p
@@ -115,36 +120,33 @@ FLUSH PRIVILEGES;
 
 ```mysql
 mysql -u root -p
-CREATE USER 'repl'@'%' IDENTIFIED BY 'your_password';
+CREATE USER 'repl'@'%' IDENTIFIED WITH mysql_native_password BY 'root123';
 GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
 FLUSH PRIVILEGES;
+
+## 查看用户
+SELECT user, host FROM mysql.user;
 ```
-
-导出数据,binlog是增量同步的 因此需要先在服务器中使用mysqldump命令来导出初始表的数据
-
-```
-
-mysqldump -uroot -p test1 t1  > /home/mysql/master-t1-table.sql
-```
-
 
 
 ### 从库配置
 
-配置从库 my.cnf  开启gtid同步，然后重启 mysql 服务
+先创建一个一模一样的数据库，导入数据，初始化原始表和数据
 
 ```
+mysql -uroot -p --verbose test1 < /home/mysql/master-t1-table.sql
+```
+
+
+
+配置从库 my.cnf  开启gtid同步，一般在/etc/mysql/my.cnf，然后重启 mysql 服务
+
+```mysql
 server-id=2
 gtid_mode=ON
 enforce_gtid_consistency=ON
 skip-slave-start=ON
 replicate-do-table=test1.t1  #库名.表名
-```
-
-导入数据，初始化原始数据
-
-```
-mysql -uroot -p test1< /home/mysql/master-t1-table.sql
 ```
 
 开始从库同步
@@ -156,7 +158,7 @@ STOP SLAVE;
 
 CHANGE MASTER TO
   MASTER_HOST='mysql-master',
-  MASTER_USER='root',
+  MASTER_USER='repl',
   MASTER_PASSWORD='root123',
   MASTER_AUTO_POSITION = 1;
 
