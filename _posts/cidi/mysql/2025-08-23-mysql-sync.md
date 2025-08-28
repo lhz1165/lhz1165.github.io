@@ -8,7 +8,7 @@ mysql主从同步
 
 ## 需求
 
-有一个主库和一个从库，从库需要同步主库的某张表
+有一个主库和一个从库，从库需要同步主库的某张表（只需要一张表 不需要整个库都同步过来）
 
 ## 实现
 
@@ -18,7 +18,7 @@ mysql主从同步
 
 ## 技术选择
 
-### 传统复制的流程
+### 1.传统复制的流程
 
 **主库写 binlog**
  主库执行更新类 SQL（INSERT、UPDATE、DELETE 等）时，把这些语句（或行事件）记录到 binlog（binary log，二进制日志文件）。
@@ -50,7 +50,7 @@ CHANGE MASTER TO
 
 如果出现 binlog 日志缺失或文件切换，容易导致复制中断。
 
-### 基于 **GTID (Global Transaction Identifier)** 
+### 2.基于 **GTID (Global Transaction Identifier)** 
 
 **故障切换更方便（简化运维）**
 
@@ -59,8 +59,9 @@ CHANGE MASTER TO
 **便于监控和管理**
 
 - 可以通过 `SHOW SLAVE STATUS\G` 直接看到 `Retrieved_Gtid_Set` 和 `Executed_Gtid_Set`，方便定位复制延迟、同步状态。
+- 基于事务来同步，因此同步整个库的时候很容易，如果只同步一张表需要过滤事务的语句，不安全
 
-**总结：** 选择GTID
+**总结：** **选择传统复制**
 
 
 
@@ -93,12 +94,27 @@ docker run -d \
 导出数据,binlog是增量同步的 因此需要先在服务器中使用mysqldump命令来导出初始表和数据
 
 ```
-mysqldump -uroot -p --set-gtid-purged=OFF test1 t1 > /home/master-t1-table.sql
+传统模式
+-- master-data=2 在传统模式导出数据的同时记录binlog位置，方便从库设置binglog读取位置
+mysqldump -h 47.113.230.36 -P 10011 -u jlfdev -p  --single-transaction --routines --triggers --no-tablespaces --set-gtid-purged=OFF --master-data=2 test1 t1 > /home/master-t1-table.sql
+
+GTID模式
+-- --set-gtid-purged=ON 记录事务的编号，方便从库设置GTID开始事务
+mysqldump -h 47.113.230.36 -P 10011 -u jlfdev -p  --single-transaction --routines --triggers --no-tablespaces --set-gtid-purged=ON  test1 t1 > /home/master-t1-table.sql
 ```
 
 配置主库 my.cnf  开启gtid同步，一般在/etc/mysql/my.cnf然后重启 mysql 服务
 
-```
+```mysql
+传统模式
+[mysqld]
+server-id=1
+log-bin=mysql-bin
+binlog_format=ROW
+binlog-do-db=test1
+
+GTID模式
+[mysqld]
 server-id=1
 log-bin=mysql-bin
 binlog_format=ROW
@@ -142,6 +158,16 @@ mysql -uroot -p --verbose test1 < /home/mysql/master-t1-table.sql
 配置从库 my.cnf  开启gtid同步，一般在/etc/mysql/my.cnf，然后重启 mysql 服务
 
 ```mysql
+传统模式
+[mysqld]
+server-id=2
+relay-log=relay-log
+log-bin=mysql-bin
+binlog_format=ROW
+replicate-do-table=test1.t1 #库名.表名
+
+GTID模式
+[mysqld]
 server-id=2
 gtid_mode=ON
 enforce_gtid_consistency=ON
@@ -154,12 +180,25 @@ replicate-do-table=test1.t1  #库名.表名
 ```mysql
 mysql -u root -p
 
-STOP SLAVE;
+STOP SLAVE;          
+RESET SLAVE ALL;  
 
+传统模式，从主库导出的sql文件查看MASTER_LOG_FILE和MASTER_LOG_POS
+CHANGE MASTER TO
+  MASTER_HOST='47.113.230.36',
+  MASTER_USER='repl',
+  MASTER_PASSWORD='replREPL/888',
+  MASTER_PORT=10011, 
+  MASTER_LOG_FILE='mysql-bin.000015',
+  MASTER_LOG_POS=215012722;
+
+GTID模式，从主库导出的sql文件查看GTID_PURGED
+SET @@GLOBAL.GTID_PURGED = 'bd64dfde-8220-11f0-ae81-ce972f96f755:1-3';
 CHANGE MASTER TO
   MASTER_HOST='mysql-master',
   MASTER_USER='repl',
-  MASTER_PASSWORD='root123',
+  MASTER_PASSWORD='replREPL/888',
+  MASTER_PORT=3306, 
   MASTER_AUTO_POSITION = 1;
 
 
