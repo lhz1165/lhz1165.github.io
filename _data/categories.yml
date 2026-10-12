@@ -3,4 +3,5 @@ categories:
   - name: Csapp Lab(cmu 15-213)
   - name: Java
   - name: C 
-  - name: test 
+  - name: test
+  - name: kafka
