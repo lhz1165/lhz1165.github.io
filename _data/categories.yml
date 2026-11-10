@@ -5,3 +5,4 @@ categories:
   - name: C 
   - name: test
   - name: kafka
+  - name: LinearAlgebra
